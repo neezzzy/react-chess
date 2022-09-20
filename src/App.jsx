@@ -1,27 +1,22 @@
 import Board from "./components/Board";
-import styled from "styled-components";
-import { useState } from "react";
-
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  flex: 1;
-  background-color: rgb(36, 35, 32);
-`;
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 function App() {
-  const [state, setState] = useState({
-    player: "w",
-  });
-
   return (
-    <Container>
-      <div style={{ width: "100vh" }}>
+    <DndProvider backend={HTML5Backend}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#2A2B2E",
+        }}
+      >
         <Board />
       </div>
-    </Container>
+    </DndProvider>
   );
 }
 

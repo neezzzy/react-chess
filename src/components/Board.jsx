@@ -1,63 +1,48 @@
-import React from "react";
-import styled from "styled-components";
-
-const WHITE = "rgb(100, 133, 68)";
-const BLACK = "rgb(230, 233, 198)";
-
-const Square = ({ white, row, col }) => {
-  const backgroundColor = white ? WHITE : BLACK;
-
-  const color = white ? BLACK : WHITE;
-
-  return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        height: "400px",
-        backgroundColor,
-      }}
-    >
-      <p
-        style={{
-          opacity: col === 0 ? 1 : 0,
-          fontWeight: "500",
-          fontSize: "5rem",
-        }}
-      >
-        {"" + (8 - row)}
-      </p>
-      <p
-        style={{
-          opacity: row === 7 ? 1 : 0,
-          alignSelf: "flex-end",
-          fontWeight: "500",
-          fontSize: "5rem",
-        }}
-      >
-        {String.fromCharCode(97 + col)}
-      </p>
-    </div>
-  );
-};
-
-const Row = ({ white, row }) => {
-  const offset = white ? 0 : 1;
-  return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "row" }}>
-      {new Array(8).fill(0).map((_, i) => (
-        <Square row={row} col={i} key={i} white={(i + offset) % 2 === 1} />
-      ))}
-    </div>
-  );
-};
+import React, { useCallback, useRef, useState } from "react";
+import { Chess } from "chess.js";
+import Piece from "./Piece";
+import Background from "./Background";
+import useWindowDimensions from "./useWindowDimensions";
 
 const Board = () => {
+  const chess = new Chess();
+
+  const { width } = useWindowDimensions();
+  const SIZE = width / 8;
+
+  const [state, setState] = useState({
+    player: "w",
+    board: chess.board(),
+  });
+
+  const onTurn = useCallback(() => {
+    setState({
+      player: state.player === "w" ? "b" : "w",
+      board: chess.board(),
+    });
+  }, [chess, state.player]);
+
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      {new Array(8).fill(0).map((_, i) => (
-        <Row key={i} white={i % 2 === 0} row={i} />
-      ))}
+    <div style={{ width: width, height: width }}>
+      {state.board.map((row, i) =>
+        row.map((square, j) => {
+          if (square !== null) {
+            return (
+              <Piece
+                key={`${i}-${j}`}
+                data-testid={`box`}
+                id={`${square.color}${square.type}`}
+                position={{ x: j * SIZE, y: i * SIZE }}
+                chess={chess}
+                onTurn={onTurn}
+                enabled={state.player === square.color}
+              />
+            );
+          }
+          return null;
+        })
+      )}
+      <Background />
     </div>
   );
 };

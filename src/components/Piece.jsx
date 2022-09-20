@@ -1,24 +1,43 @@
 import React from "react";
+import useWindowDimensions from "./useWindowDimensions";
+import { useDrag } from "react-dnd";
+import ItemTypes from "../types/items";
+const Piece = ({ id, position }) => {
+  const { width } = useWindowDimensions();
+  const SIZE = width / 8;
 
-export const PIECES = {
-  br: require("./assets/br.png"),
-  bp: require("./assets/bp.png"),
-  bn: require("./assets/bn.png"),
-  bb: require("./assets/bb.png"),
-  bq: require("./assets/bq.png"),
-  bk: require("./assets/bk.png"),
-  wr: require("./assets/wr.png"),
-  wn: require("./assets/wn.png"),
-  wb: require("./assets/wb.png"),
-  wq: require("./assets/wq.png"),
-  wk: require("./assets/wk.png"),
-  wp: require("./assets/wp.png"),
-};
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.Piece,
+    item: { name },
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult();
+      if (item && dropResult) {
+        console.log(`You dropped ${item.name} into ${dropResult.name}!`);
+      }
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      handlerId: monitor.getHandlerId(),
+    }),
+  }));
+  const opacity = isDragging ? 0.4 : 1;
 
-const SIZE = "50px";
-
-const Piece = ({ id, startPosition, chess, onTurn, enabled }) => {
-  return <img src={PIECES[id]} style={{ width: SIZE, height: SIZE }} />;
+  return (
+    <img
+      ref={drag}
+      style={{
+        opacity: opacity,
+        cursor: "move",
+        width: SIZE,
+        height: SIZE,
+        position: "absolute",
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        zIndex: 10,
+      }}
+      alt="chess piece"
+      src={`images/${id}.png`}
+    />
+  );
 };
 
 export default Piece;
