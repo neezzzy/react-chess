@@ -1,50 +1,56 @@
-import React, { useCallback, useRef, useState } from "react";
-import { Chess } from "chess.js";
-import Piece from "./Piece";
-import Background from "./Background";
-import useWindowDimensions from "./useWindowDimensions";
+import React from "react";
+import Square from "../components/Square";
+import Knight from "../components/Knight";
+import BoardSquare from "../components/BoardSquare";
+import { canMoveKnight, moveKnight } from "../components/Game";
 
-const Board = () => {
-  const chess = new Chess();
-
-  const { width } = useWindowDimensions();
-  const SIZE = width / 8;
-
-  const [state, setState] = useState({
-    player: "w",
-    board: chess.board(),
-  });
-
-  const onTurn = useCallback(() => {
-    setState({
-      player: state.player === "w" ? "b" : "w",
-      board: chess.board(),
-    });
-  }, [chess, state.player]);
-
+function renderSquare(i, knightPosition) {
+  const x = i % 8
+  const y = Math.floor(i / 8)
   return (
-    <div style={{ width: width, height: width }}>
-      {state.board.map((row, i) =>
-        row.map((square, j) => {
-          if (square !== null) {
-            return (
-              <Piece
-                key={`${i}-${j}`}
-                data-testid={`box`}
-                id={`${square.color}${square.type}`}
-                position={{ x: j * SIZE, y: i * SIZE }}
-                chess={chess}
-                onTurn={onTurn}
-                enabled={state.player === square.color}
-              />
-            );
-          }
-          return null;
-        })
-      )}
-      <Background />
+    <div key={i} style={{ width: '12.5%', height: '12.5%' }}>
+      <BoardSquare x={x} y={y}>
+        {renderPiece(x, y, knightPosition)}
+      </BoardSquare>
     </div>
-  );
+  )
+}
+
+function renderPiece(x, y, [knightX, knightY]) {
+  if (x === knightX && y === knightY) {
+    return <Knight />
+  }
+}
+
+
+export default function Board({ knightPosition }) {
+  const squares = [];
+  for (let i = 0; i < 64; i++) {
+    squares.push(renderSquare(i, knightPosition));
+  }
+
+  return <div style={boardStyle}>{squares}</div>;
+}
+
+function handleSquareClick(toX, toY) {
+  if (canMoveKnight(toX, toY)) {
+    moveKnight(toX, toY);
+  }
+}
+
+// styling properties applied to the board element
+const boardStyle = {
+  margin: "0 auto",
+  width: "100vmin",
+  height: "100vmin",
+  display: "flex",
+  flexWrap: "wrap",
+  fontSize: "10vmin",
+  border: "1px solid black",
 };
 
-export default Board;
+// styling properties applied to each square element
+const squareStyle = {
+  width: "12.5%",
+  height: "12.5%",
+};
