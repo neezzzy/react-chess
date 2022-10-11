@@ -1,4 +1,4 @@
-### Chatter-App
+### Chatter-App (WIP)
 
 <!-- PROJECT LOGO -->
 <div align="center">
