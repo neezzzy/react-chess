@@ -1,18 +1,47 @@
-import { useEffect, useState } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import Board from "./components/Board";
-import { observe } from "./components/Game";
+import React, { useState } from 'react';
+import Board from './components/Board';
+import Piece from './components/Piece';
+import { Chess } from 'chess.js';
+
+import styled from 'styled-components';
+
+const BoardContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 function App() {
-  // since all that is needed in this simple demo is a stream of values, entire app is wrapped by an observer that subscribes to a changing state in the most minimal, non-complex way (rather than using EventEmitter or making Game an object model)
-  const [knightPosition, setKnightPosition] = useState([1, 7]);
-  // the observe function will return an unsubscribe callback
-  useEffect(() => observe((newPosition) => setKnightPosition(newPosition)));
+  const chess = new Chess();
+  const width = 800;
+  const SIZE = width / 8;
+
+  const [state, setState] = useState({
+    player: 'w',
+    board: chess.board(),
+  });
+
   return (
-    <DndProvider backend={HTML5Backend}>
-      <Board knightPosition={knightPosition} />
-    </DndProvider>
+    <BoardContainer>
+      <Board>
+        {state.board.map((row, i) =>
+          row.map((square, j) => {
+            if (square !== null) {
+              return (
+                <Piece
+                  key={`${i}-${j}`}
+                  id={`${square.color}${square.type}`}
+                  position={{ x: j * SIZE, y: i * SIZE }}
+                  chess={chess}
+                  enabled={state.player === square.color}
+                />
+              );
+            }
+            return null;
+          })
+        )}
+      </Board>
+    </BoardContainer>
   );
 }
 
