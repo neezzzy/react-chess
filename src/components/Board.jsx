@@ -11,12 +11,22 @@ export default function Board({ board }) {
     const { x, y } = getXYPosition(i);
     return (x + y) % 2 === 1;
   }
-  11;
+
+  function getPosition(i) {
+    const { x, y } = getXYPosition(i);
+    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'][x];
+    return `${letters}${y + 1}`;
+  }
+
   return (
     <div className="board">
       {board.flat().map((piece, index) => (
         <div key={index} className="square">
-          <BoardSquare piece={piece} black={isBlack(index)} />
+          <BoardSquare
+            piece={piece}
+            black={isBlack(index)}
+            position={getPosition(index)}
+          />
         </div>
       ))}
     </div>
