@@ -1,48 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { gameSubject } from './Game';
 import Board from './components/Board';
-import Piece from './components/Piece';
 import { Chess } from 'chess.js';
+import './App.css';
 
-import styled from 'styled-components';
-
-const BoardContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-function App() {
+export default function App() {
   const chess = new Chess();
-  const width = 800;
-  const SIZE = width / 8;
+  const [board, setBoard] = useState(chess.board());
 
-  const [state, setState] = useState({
-    player: 'w',
-    board: chess.board(),
-  });
+  useEffect(() => {
+    const subscribe = gameSubject.subscribe((game) => setBoard(game.board));
+    return () => subscribe.unsubscribe();
+  }, []);
 
   return (
-    <BoardContainer>
-      <Board>
-        {state.board.map((row, i) =>
-          row.map((square, j) => {
-            if (square !== null) {
-              return (
-                <Piece
-                  key={`${i}-${j}`}
-                  id={`${square.color}${square.type}`}
-                  position={{ x: j * SIZE, y: i * SIZE }}
-                  chess={chess}
-                  enabled={state.player === square.color}
-                />
-              );
-            }
-            return null;
-          })
-        )}
-      </Board>
-    </BoardContainer>
+    <div className='App'>
+      <div className='container'>
+      <Board board={board} />
+      </div>
+
+    </div>
   );
 }
-
-export default App;
