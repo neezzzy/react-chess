@@ -1,42 +1,44 @@
 import React from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import BoardSquare from './BoardSquare';
+import Knight from './Knight';
 
-function Row({ rowNumber, white, width, height }) {
-  const offset = white ? 0 : 1;
-  const backgroundColor = (i) => ((i + offset) % 2 === 1 ? 'white' : 'black');
+function renderSquare(i, knightPosition) {
+  const x = i % 8;
+  const y = Math.floor(i / 8);
   return (
-    <div style={{ display: 'flex' }}>
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            backgroundColor: backgroundColor(i),
-            width: width,
-            height: height,
-            color: 'red',
-          }}
-        >
-          {String.fromCharCode(i + 65)} {rowNumber}
-        </div>
-      ))}
+    <div key={i} style={{ width: '12.5%', height: '12.5%' }}>
+      <BoardSquare x={x} y={y}>
+        {renderPiece(x, y, knightPosition)}
+      </BoardSquare>
     </div>
   );
 }
 
-export default function Board({ children }) {
-  const height = 800;
-  const width = 800;
+function renderPiece(x, y, [knightX, knightY]) {
+  if (x === knightX && y === knightY) {
+    return <Knight />;
+  }
+}
+
+export default function Board({ knightPosition }) {
+  const squares = [];
+  for (let i = 0; i < 64; i++) {
+    squares.push(renderSquare(i, knightPosition));
+  }
   return (
-    <div style={{position: 'relative'}}>
-      {[...Array(8)].map((_, i) => (
-        <Row
-          height={height / 8}
-          width={width / 8}
-          white={i % 2 === 0}
-          key={i}
-          rowNumber={8 - i}
-        ></Row>
-      ))}
-      {children}
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <div
+        style={{
+          width: '500px',
+          height: '500px',
+          display: 'flex',
+          flexWrap: 'wrap',
+        }}
+      >
+        {squares}
+      </div>
+    </DndProvider>
   );
 }
