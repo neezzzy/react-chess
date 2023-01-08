@@ -1,23 +1,24 @@
-import Board from "./components/Board";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import React, { useEffect, useState } from 'react';
+import { gameSubject } from './Game';
+import Board from './components/Board';
+import { Chess } from 'chess.js';
+import './App.css';
 
-function App() {
+export default function App() {
+  const chess = new Chess();
+  const [board, setBoard] = useState(chess.board());
+
+  useEffect(() => {
+    const subscribe = gameSubject.subscribe((game) => setBoard(game.board));
+    return () => subscribe.unsubscribe();
+  }, []);
+
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          backgroundColor: "#2A2B2E",
-        }}
-      >
-        <Board />
+    <div className='App'>
+      <div className='container'>
+      <Board board={board} />
       </div>
-    </DndProvider>
+
+    </div>
   );
 }
-
-export default App;

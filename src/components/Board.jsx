@@ -1,50 +1,24 @@
-import React, { useCallback, useRef, useState } from "react";
-import { Chess } from "chess.js";
-import Piece from "./Piece";
-import Background from "./Background";
-import useWindowDimensions from "./useWindowDimensions";
+import React from 'react';
+import BoardSquare from './BoardSquare';
 
-const Board = () => {
-  const chess = new Chess();
-
-  const { width } = useWindowDimensions();
-  const SIZE = width / 8;
-
-  const [state, setState] = useState({
-    player: "w",
-    board: chess.board(),
-  });
-
-  const onTurn = useCallback(() => {
-    setState({
-      player: state.player === "w" ? "b" : "w",
-      board: chess.board(),
-    });
-  }, [chess, state.player]);
-
+export default function Board({ board }) {
+  function getXYPosition(i) {
+    const x = i % 8;
+    const y = Math.abs(Math.floor(i / 8) - 7);
+    return { x, y };
+  }
+  function isBlack(i) {
+    const { x, y } = getXYPosition(i);
+    return (x + y) % 2 === 1;
+  }
+  11;
   return (
-    <div style={{ width: width, height: width }}>
-      {state.board.map((row, i) =>
-        row.map((square, j) => {
-          if (square !== null) {
-            return (
-              <Piece
-                key={`${i}-${j}`}
-                data-testid={`box`}
-                id={`${square.color}${square.type}`}
-                position={{ x: j * SIZE, y: i * SIZE }}
-                chess={chess}
-                onTurn={onTurn}
-                enabled={state.player === square.color}
-              />
-            );
-          }
-          return null;
-        })
-      )}
-      <Background />
+    <div className="board">
+      {board.flat().map((piece, index) => (
+        <div key={index} className="square">
+          <BoardSquare piece={piece} black={isBlack(index)} />
+        </div>
+      ))}
     </div>
   );
-};
-
-export default Board;
+}
