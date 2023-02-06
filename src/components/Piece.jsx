@@ -7,7 +7,7 @@ export default function Piece({ piece: { type, color }, position }) {
     item: { id: `${position}_${type}_${color}` },
     type: 'piece',
     collect: (monitor) => {
-      return { isDragging: !!monitor.isDragging() };
+      return { isDragging: monitor.isDragging() };
     },
   });
 

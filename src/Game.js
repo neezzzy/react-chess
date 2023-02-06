@@ -1,16 +1,10 @@
-import { Chess } from 'chess.js';
-import { BehaviorSubject } from 'rxjs';
 
-const chess = new Chess();
 
-export const gameSubject = new BehaviorSubject({
-  board: chess.board(),
-});
-
-export function move(from, to) {
-  const legalMove = chess.move({ from: from, to: to });
-
-  if (legalMove) {
-    gameSubject.next({ board: chess.board() });
+export function move(from, to, chess, onTurn) {
+  const moves = chess.moves({ verbose: true });
+  const move = moves.find((m) => m.from === from && m.to === to);
+  if (move) {
+    chess.move({ from, to });
+    onTurn();
   }
 }
