@@ -8,9 +8,7 @@
   </p>
 </div>
 
-<p align="center">
-  ![image of the application](/react-chess/hero-2.jpg)
-</p>
+![image of the application](/hero-2.jpg)
 
 <!-- TABLE OF CONTENTS -->
 <details>
